@@ -1,0 +1,25 @@
+# Archivos de estado y planes locales de Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Directorios locales de Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Archivos de variables que pueden contener secretos
+*.tfvars
+*.tfvars.json
+
+# Archivos de override locales
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Archivos de configuración de IDEs y OS
+.vscode/
+.idea/
+.DS_Store
