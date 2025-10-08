@@ -3,11 +3,12 @@ set -e
 echo "🚀 FASE 1: Configurando Backend Seguro para Terraform..."
 
 AWS_REGION="us-east-1"
-PROJECT_NAME="tf-enterprise-foundation"
+PROJECT_NAME="tf-s3-lab-backend" # Un nombre de proyecto diferente para el backend
 TIMESTAMP=$(date +%s)
 TERRAFORM_BUCKET="${PROJECT_NAME}-tfstate-${TIMESTAMP}"
 DYNAMODB_TABLE="${PROJECT_NAME}-tf-locks"
-BACKEND_CONFIG_FILE="environments/dev/backend.tf"
+# CORRECCIÓN: Apunta al directorio raíz actual (.)
+BACKEND_CONFIG_FILE="backend.tf"
 
 echo "📦 Creando bucket S3 '$TERRAFORM_BUCKET'..."
 aws s3api create-bucket --bucket "$TERRAFORM_BUCKET" --region "$AWS_REGION"
@@ -25,17 +26,15 @@ aws dynamodb create-table \
 
 echo "📝 Generando archivo de configuración del backend..."
 cat > "$BACKEND_CONFIG_FILE" << EOF
-# Este archivo es generado automáticamente por el script 01-setup-backend.sh
-# NO MODIFICAR MANUALMENTE
-
+# Este archivo es generado automáticamente. NO MODIFICAR MANUALMENTE.
 terraform {
   backend "s3" {
     bucket  = "$TERRAFORM_BUCKET"
-    key     = "dev/terraform.tfstate"
+    key     = "global/s3-lab/terraform.tfstate"
     region  = "$AWS_REGION"
-    # La línea 'dynamodb_table' se elimina ya que S3 ahora lo maneja automáticamente
     encrypt = true
   }
 }
 EOF
+
 echo "✅ ¡Configuración del Backend completada!"
