@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-PROJECT_NAME="tf-enterprise-foundation"
+# CORRECCIÓN: Usamos el mismo nombre de proyecto que el script 01
+PROJECT_NAME="tf-s3-lab-backend"
 DYNAMODB_TABLE="${PROJECT_NAME}-tf-locks"
 BUCKET_PREFIX="${PROJECT_NAME}-tfstate-"
 
@@ -16,10 +17,9 @@ if [ -z "$BUCKETS" ]; then
 else
     for bucket in $BUCKETS; do
         echo "🔥 Vaciando todas las versiones de objetos del bucket $bucket..."
-        # Este comando elimina todas las versiones de objetos y marcadores de borrado.
         aws s3api delete-objects --bucket $bucket --delete "$(aws s3api list-object-versions --bucket $bucket --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')" > /dev/null 2>&1 || true
         aws s3api delete-objects --bucket $bucket --delete "$(aws s3api list-object-versions --bucket $bucket --query='{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}')" > /dev/null 2>&1 || true
-        
+
         echo "🗑️ Eliminando bucket S3: $bucket..."
         aws s3api delete-bucket --bucket $bucket
         echo "✅ Bucket $bucket eliminado."
