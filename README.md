@@ -25,16 +25,13 @@
 
 ## 📋 Tabla de Contenidos
 
-1. [🎯 Objetivo del Workshop](#-objetivo-del-workshop)
-2. [✨ Buenas Prácticas Demostradas](#-buenas-prácticas-demostradas)
-3. [⚙️ Prerrequisitos](#️-prerrequisitos)
-4. [🚀 Guía de Ejecución Detallada](#-guía-de-ejecución-detallada)
-   * [Fase 1: Preparación del Entorno](#fase-1-preparación-del-entorno)
-   * [Fase 2: Despliegue de la Infraestructura](#fase-2-despliegue-de-la-infraestructura)
-   * [Fase 3: Verificación de Funcionalidad](#fase-3-verificación-de-funcionalidad)
-   * [Fase 4: Limpieza Final y Control de Costos](#fase-4-limpieza-final-y-control-de-costos)
-5. [📁 Estructura de Archivos](#-estructura-de-archivos)
-6. [🤝 Contribuciones y Contacto](#-contribuciones-y-contacto)
+1. [🎯 Objetivo del Workshop](#-objetivo-del-workshop)  
+2. [✨ Buenas Prácticas Demostradas](#-buenas-prácticas-demostradas)  
+3. [⚙️ Prerrequisitos](#️-prerrequisitos)  
+4. [🚀 Guía de Ejecución Detallada](#-guía-de-ejecución-detallada)  
+5. [📁 Estructura de Archivos](#-estructura-de-archivos)  
+6. [🤝 Contribuciones y Contacto](#-contribuciones-y-contacto)  
+7. [🧪 Pruebas Avanzadas: Versionado y Limpieza](#-pruebas-avanzadas-versionado-y-limpieza)
 
 ---
 
@@ -65,10 +62,10 @@ Este laboratorio demuestra cómo desplegar un **bucket de Amazon S3** de nivel p
 
 ## ⚙️ Prerrequisitos
 
-- **WSL Ubuntu 24.04 LTS** (o cualquier terminal Linux/macOS).
-- **AWS CLI** instalado y configurado con credenciales de IAM.
-- **Terraform** instalado.
-- **Git** instalado.
+- **WSL Ubuntu 24.04 LTS** (o cualquier terminal Linux/macOS).  
+- **AWS CLI** instalado y configurado con credenciales de IAM.  
+- **Terraform** instalado.  
+- **Git** instalado.  
 
 ---
 
@@ -76,54 +73,27 @@ Este laboratorio demuestra cómo desplegar un **bucket de Amazon S3** de nivel p
 
 ### Fase 1: Preparación del Entorno
 
-#### 1. Clonar el Repositorio
-
 ```bash
 git clone https://github.com/jgaragorry/Bucket-S3-Seguro-en-AWS.git
 cd Bucket-S3-Seguro-en-AWS
 ```
-
-> Qué hace: Descarga una copia local del proyecto.  
-> Por qué: Para tener todos los archivos de código y scripts en tu máquina.
-
-#### 2. Configurar el Nombre Único del Bucket
 
 ```hcl
 # terraform.tfvars
 bucket_name_suffix = "tus-iniciales-fecha" # ej: "jg-20251008"
 ```
 
-> Qué hace: Define un sufijo único.  
-> Por qué es importante: Los nombres de los buckets S3 deben ser únicos a nivel mundial.
-
-#### 3. Dar Permisos a los Scripts
-
 ```bash
 chmod +x scripts/*.sh
 ```
-
-> Qué hace: Permite que la terminal ejecute los archivos de script.  
-> Por qué es importante: Por defecto, los archivos descargados no tienen permisos de ejecución.
 
 ---
 
 ### Fase 2: Despliegue de la Infraestructura
 
-#### 1. Configurar el Backend
-
 ```bash
 ./scripts/01-setup-backend.sh
-```
-
-#### 2. Planificar la Infraestructura
-
-```bash
 ./scripts/02-initialize-project.sh
-```
-
-#### 3. Desplegar la Infraestructura
-
-```bash
 ./scripts/03-deploy-infrastructure.sh
 ```
 
@@ -131,26 +101,16 @@ chmod +x scripts/*.sh
 
 ### Fase 3: Verificación de Funcionalidad
 
-Acción: Ve a la Consola de AWS → S3 y haz clic en tu bucket principal.
-
-#### Qué verificar:
-
-- **Properties:** Versioning, Encryption y Logging habilitados.
-- **Permissions:** Block public access en "On".
+- Revisa en AWS S3:
+  - **Properties:** Versioning, Encryption y Logging habilitados.  
+  - **Permissions:** Block public access en "On".
 
 ---
 
 ### Fase 4: Limpieza Final y Control de Costos
 
-#### 1. Destruir la Infraestructura Principal
-
 ```bash
 ./scripts/05-destroy-resources.sh
-```
-
-#### 2. Limpiar el Backend
-
-```bash
 ./scripts/cleanup-backend.sh
 ```
 
@@ -180,3 +140,52 @@ Las contribuciones son bienvenidas. Si encuentras un problema o tienes una suger
   </a>
 </p>
 
+---
+
+## 🧪 Pruebas Avanzadas: Versionado y Limpieza
+
+<p align="center">
+  <img src="https://img.shields.io/badge/SRE-Test-0052CC?style=for-the-badge&logo=datadog&logoColor=white" alt="SRE Badge">
+  <img src="https://img.shields.io/badge/AWS-S3-FF9900?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS S3 Badge">
+  <img src="https://img.shields.io/badge/Cleanup-Automation-28A745?style=for-the-badge&logo=power-shell&logoColor=white" alt="Cleanup Badge">
+</p>
+
+**Propósito:** Verificar el versionado del bucket S3 y aplicar una limpieza avanzada para evitar el error `BucketNotEmpty`.
+
+**Prerrequisito:** Haber ejecutado:
+
+```bash
+./scripts/03-deploy-infrastructure.sh
+```
+
+### Parte 1: Prueba del Versionado
+
+```bash
+echo "Esta es la versión 1 del archivo." > mi-documento.txt
+aws s3 cp mi-documento.txt s3://tu-bucket-principal/
+
+echo "Esta es la versión 2, con contenido actualizado." > mi-documento.txt
+aws s3 cp mi-documento.txt s3://tu-bucket-principal/
+
+aws s3api list-object-versions --bucket tu-bucket-principal --prefix mi-documento.txt
+
+aws s3 rm s3://tu-bucket-principal/mi-documento.txt
+
+aws s3api list-object-versions --bucket tu-bucket-principal --prefix mi-documento.txt
+```
+
+### Parte 2: Limpieza Definitiva
+
+```bash
+MAIN_BUCKET="tu-bucket-principal"
+LOG_BUCKET="tu-bucket-principal-logs"
+
+aws s3api delete-objects --bucket $MAIN_BUCKET --delete "$(aws s3api list-object-versions --bucket $MAIN_BUCKET --query='{Objects: concat(Versions, DeleteMarkers)[].{Key:Key,VersionId:VersionId}}')" > /dev/null
+
+aws s3 rb s3://$MAIN_BUCKET
+aws s3 rb s3://$LOG_BUCKET --force
+
+./scripts/cleanup-backend.sh
+```
+
+✅ ¡Listo! Has validado
